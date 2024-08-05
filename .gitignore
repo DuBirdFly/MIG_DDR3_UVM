@@ -1,0 +1,7 @@
+prj/modelsim/*
+!prj/modelsim/do
+!prj/modelsim/filelist
+!prj/modelsim/run.log
+
+.vscode
+bak
