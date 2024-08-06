@@ -1,15 +1,28 @@
--incr
--mfcu
--sv
+-incr -mfcu -sv
+
 -work work
 
+//* UVM 1.1d ********************************************
+-L mtiAvm -L mtiOvm -L mtiUvm -L mtiUPF
++acc
+
++incdir+D:/Codes/Modelsim/Modelsim_10_7/verilog_src/uvm-1.1d/src
+D:/Codes/Modelsim/Modelsim_10_7/verilog_src/uvm-1.1d/src/uvm_pkg.sv
+
+//* Include directories *********************************
 +incdir+../../memory
++incdir+../../sim
 +incdir+../../sim/axi
++incdir+../../sim/axi/agent
++incdir+../../sim/axi/channel
++incdir+../../sim/axi/env
++incdir+../../sim/axi/seq
 +incdir+../../sim/env
 +incdir+../../sim/mem
 +incdir+../../sim/top
 +incdir+../../sim/wrapper
 
+//* Dut Files ********************************************
 ../../dut/axi/mig_7series_v4_2_axi_ctrl_addr_decode.v
 ../../dut/axi/mig_7series_v4_2_axi_ctrl_read.v
 ../../dut/axi/mig_7series_v4_2_axi_ctrl_reg.v
@@ -119,8 +132,10 @@
 ../../dut/mig_mig_sim.v
 ../../dut/mig.v
 
+//* Memory Model ********************************************
 ../../memory/ddr3_model.sv
 
+//* Testbench Files ********************************************
 ../../sim/top/glbl.v
 ../../sim/wrapper/wiredly.v
 ../../sim/top/Top.sv

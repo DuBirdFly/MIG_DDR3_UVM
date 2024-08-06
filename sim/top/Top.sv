@@ -1,14 +1,28 @@
+import uvm_pkg::*;
+`include "uvm_macros.svh"
+
 `timescale 1ps/100fs
 
-`include "mem_constant.svh"
-`include "axi_constant.svh"
-
+// mem
+`include "mem_constants.svh"
 `include "IfMem.sv"
-`include "IfAxi.sv"
 
+// wrapper
 `include "wrapper_mig.sv"
 `include "wrapper_pcb_dly.sv"
 `include "wrapper_ddr3.sv"
+
+// zpf_uvm_wrapper
+`include "zpf_defines.svh"
+
+// axi_vip
+`include "axi_includes.svh"
+
+// Top_env
+`include "Env.sv"
+
+// test_top
+`include "Test.sv"
 
 module Top;
     //**************************************************************************//
@@ -42,7 +56,8 @@ module Top;
     //****************************************************
     IfAxi   ifAxi(
         .aclk       ( ui_clk            ),
-        .aresetn    ( ~ui_clk_sync_rst  )
+        .aresetn    ( ~ui_clk_sync_rst  ),
+        .init_calib_complete    (init_calib_complete)
     );
 
     //* FPGA Options *************************************
@@ -62,7 +77,7 @@ module Top;
     //****************************************************
     wrapper_mig u_wrapper_mig(
         .ifMem                  ( ifMemFPGA             ), // 1.25 ns = 800MHz (double data rate: 1600MHz)
-        .ifAxi                  ( ifAxi                 ),
+        .ifAxi                  ( ifAxi.SLAVE           ),
 
         .sys_rst                ( ~sys_rst_n            ), // input
         .aresetn                ( sys_rst_n             ), // input
@@ -103,26 +118,27 @@ module Top;
         .ifMem                  ( ifMemDDR3            )
     );
 
-    //**************************************************************************//
+    //* UVM Environment **********************************
+    initial begin: uvm_config_db_interface
+        uvm_config_db#(virtual IfAxi)::set(null, "uvm_test_top", "vifAxi", ifAxi);
+        uvm_config_db#(virtual IfAxi)::set(null, "uvm_test_top.env.axiMstrEnv.axiMstrAgtWr.axiMstrChnAw", "vifAxi", ifAxi);
+        uvm_config_db#(virtual IfAxi)::set(null, "uvm_test_top.env.axiMstrEnv.axiMstrAgtWr.axiMstrChnW",  "vifAxi", ifAxi);
+        uvm_config_db#(virtual IfAxi)::set(null, "uvm_test_top.env.axiMstrEnv.axiMstrAgtWr.axiMstrChnB",  "vifAxi", ifAxi);
+        uvm_config_db#(virtual IfAxi)::set(null, "uvm_test_top.env.axiMstrEnv.axiMstrAgtRd.axiMstrChnAr", "vifAxi", ifAxi);
+        uvm_config_db#(virtual IfAxi)::set(null, "uvm_test_top.env.axiMstrEnv.axiMstrAgtRd.axiMstrChnR",  "vifAxi", ifAxi);
+        uvm_config_db#(virtual IfAxi)::set(null, "uvm_test_top.env.axiMstrEnv.axiMstrAgtRd.axiMstrMonR",  "vifAxi", ifAxi);
+    end
+
+    initial begin: out_of_init_calib_time
+        #200ms; // 大概在 55.6 ms 时初始化完成
+        if (init_calib_complete != 1)
+            $display("TEST FAILED: INITIALIZATION DID NOT COMPLETE");
+        $finish;
+    end
+
     initial begin
-        fork
-            begin : calibration_done
-                wait (init_calib_complete);
-                $display("Calibration Done");
-                // #50_000_000.0; // 50ms
-                #500_000; // 500000 ps = 500 ns
-                $display("TEST PASSED");
-                disable calib_not_done;
-                $finish;
-            end
-            begin : calib_not_done
-                #1000000000.0;
-                if (!init_calib_complete)
-                    $display("TEST FAILED: INITIALIZATION DID NOT COMPLETE");
-                disable calibration_done;
-                $finish;
-            end
-        join
+        $timeformat(-9, 3, "ns", 12);
+        run_test("Test");
     end
 
 endmodule

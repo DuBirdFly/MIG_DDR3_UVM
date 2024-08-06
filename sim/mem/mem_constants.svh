@@ -1,5 +1,5 @@
-`ifndef __MEM_CONSTANT_SVH__
-    `define __MEM_CONSTANT_SVH__
+`ifndef __MEM_CONSTANTS_SVH__
+    `define __MEM_CONSTANTS_SVH__
 
     `define MEM_DQ_WIDTH        32
     `define MEM_DQS_WIDTH       4

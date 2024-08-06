@@ -1,5 +1,5 @@
-`ifndef __AXI_CONSTANT_SVH__
-    `define __AXI_CONSTANT_SVH__
+`ifndef __AXI_CONSTANTS_SVH__
+    `define __AXI_CONSTANTS_SVH__
 
     // 可配置
     `define AXI_ID_WIDTH    4

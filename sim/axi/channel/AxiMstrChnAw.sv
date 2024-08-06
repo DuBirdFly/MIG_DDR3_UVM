@@ -26,9 +26,9 @@ class AxiMstrChnAw extends uvm_driver #(TrAxi);
 
         {vifAxi.awid, vifAxi.awaddr, vifAxi.awlen, vifAxi.awsize, vifAxi.awburst, vifAxi.awvalid} = '{default:0};
 
-        vifAxi.aresetn = 0;
-        repeat (20) @(vifAxi.m_cb);
-        vifAxi.aresetn = 1;
+        // vifAxi.aresetn = 0;
+        // repeat (20) @(vifAxi.m_cb);
+        // vifAxi.aresetn = 1;
 
         phase.drop_objection(this);
     endtask

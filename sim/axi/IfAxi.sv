@@ -1,6 +1,7 @@
 interface IfAxi (
     input logic                     aclk,
-    input logic                     aresetn
+    input logic                     aresetn,
+    input logic                     init_calib_complete
 );
 
     logic [`AXI_ID_WIDTH-1:0]       awid;
