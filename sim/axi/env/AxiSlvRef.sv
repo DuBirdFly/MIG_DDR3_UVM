@@ -25,6 +25,24 @@ class AxiSlvRef extends uvm_component;
         super.new(name, parent);
     endfunction
 
+    virtual function void print_queue();
+        $write("    tr_q_aw.id[$] = {");
+        foreach (tr_q_aw[i]) begin
+            if (i != 0) $write(", ");
+            $write("%0h", tr_q_aw[i].id);
+        end
+        $write("};  ");
+
+        $write(" tr_q_w.len() = %0d;  ", tr_q_w.size());
+
+        $write(" tr_q_wr.id[$] = {");
+        foreach (tr_q_wr[i]) begin
+            if (i != 0) $write(", ");
+            $write("%0h", tr_q_wr[i].id);
+        end
+        $write("}\n");
+    endfunction
+
     virtual function void check_outstanding();
         if (tr_q_aw.size() + tr_q_wr.size() > `AXI_OUTSTANDING ||
             tr_q_w.size()  + tr_q_wr.size() > `AXI_OUTSTANDING
@@ -44,8 +62,8 @@ class AxiSlvRef extends uvm_component;
         case (tr_q_w.size())
             0: tr_q_aw.push_back(tr_aw);
             default: begin
-                // if (tr_aw.len + 1 != tr_q_w(0).data.size())
-                //     `uvm_fatal(get_type_name(), "AW LEN Size Error")
+                if (tr_aw.len + 1 != tr_q_w[0].data.size())
+                    `uvm_fatal(get_type_name(), "AW LEN Size Error")
 
                 tr_aw.clone_data_from(tr_q_w.pop_front());
                 tr_q_wr.push_back(tr_aw);
@@ -53,6 +71,7 @@ class AxiSlvRef extends uvm_component;
         endcase
 
         this.check_outstanding();
+        print_queue();
         key.put();
     endtask
 
@@ -73,6 +92,7 @@ class AxiSlvRef extends uvm_component;
         endcase
 
         this.check_outstanding();
+        print_queue();
         key.put();
     endtask
 
@@ -100,12 +120,13 @@ class AxiSlvRef extends uvm_component;
         // Chn B 必须在 Chn AW+W 之后
         if (check_chn_order == 0) begin
             string str = $sformatf("B Channel Order Error: tr_b.id = 0x%0h\n", tr_b.id);
-            str = {str, "  There are %0d WR-Transaction(s) in the Queue:\n", tr_q_wr.size()};
+            str = {str, $sformatf("  There are %0d WR-Transaction(s) in the Queue:\n", tr_q_wr.size())};
             foreach (tr_q_wr[i]) str = {str, "    ", tr_q_wr[i].get_addr_info(), "\n"};
             `uvm_fatal(get_type_name(), str);
         end
 
         this.check_outstanding();
+        print_queue();
         key.put();
     endtask
 

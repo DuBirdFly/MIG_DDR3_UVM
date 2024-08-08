@@ -25,6 +25,9 @@ class Test extends uvm_test;
         if (!uvm_config_db#(virtual IfAxi)::get(this, "", "vifAxi", vifAxi))
             `uvm_fatal("NOVIF", "No IfAxi Interface Specified")
         /* uvm_config_db#(<type>)::set(<uvm_component>, <"inst_name">, <"field_name">, <value>); */
+
+        // set_report_verbosity_level_hier
+        env.axiMstrEnv.axiSlvRef.set_report_verbosity_level_hier(UVM_DEBUG);
     endfunction
 
     virtual function void start_of_simulation_phase(uvm_phase phase);
@@ -44,6 +47,19 @@ class Test extends uvm_test;
         $display("\n============================================");
         $display("    Init Calib Done (time: %t)    ", $time());
         $display("============================================\n");
+
+        #500ns;
+
+        @(vifAxi.m_cb);
+        axiMstrSeqWr.start(env.axiMstrEnv.axiMstrVirSqrWr);
+        #500ns;
+        if (env.axiMstrEnv.axiSlvRef.tr_q_aw.size() != 0) `uvm_warning("CRITICAL", "AW Queue is not empty in AxiSlvRef")
+        if (env.axiMstrEnv.axiSlvRef.tr_q_w.size()  != 0) `uvm_warning("CRITICAL", "W  Queue is not empty in AxiSlvRef")
+        if (env.axiMstrEnv.axiSlvRef.tr_q_wr.size() != 0) `uvm_warning("CRITICAL", "WR Queue is not empty in AxiSlvRef")
+
+        env.axiMstrEnv.axiSlvRef.peek_mem();
+
+        #500ns;
 
         phase.drop_objection(this);
     endtask

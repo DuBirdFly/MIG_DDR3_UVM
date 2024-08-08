@@ -48,10 +48,11 @@ class AxiMstrChnB extends uvm_driver #(TrAxi);
         tr.resp = vifAxi.m_cb.bresp;
 
         @(vifAxi.m_cb);
-        vifAxi.m_cb.bready <= 0;
-        @(vifAxi.m_cb);
 
+        vifAxi.m_cb.bready <= 0;
         put_port.put(tr);
+
+        @(vifAxi.m_cb);
 
     endtask
 
