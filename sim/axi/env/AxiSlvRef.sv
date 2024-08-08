@@ -56,43 +56,47 @@ class AxiSlvRef extends uvm_component;
     endfunction
 
     virtual task put_aw(TrAxi tr_aw);
+        TrAxi tr_put_aw = TrAxi::type_id::create("tr_put_aw");
+        tr_put_aw.clone_from(tr_aw);
+
         key.get();
         `uvm_info(get_type_name(), "Chn AW Put", UVM_DEBUG)
 
         case (tr_q_w.size())
-            0: tr_q_aw.push_back(tr_aw);
+            0: tr_q_aw.push_back(tr_put_aw);
             default: begin
-                if (tr_aw.len + 1 != tr_q_w[0].data.size())
+                if (tr_put_aw.len + 1 != tr_q_w[0].data.size())
                     `uvm_fatal(get_type_name(), "AW LEN Size Error")
 
-                tr_aw.clone_data_from(tr_q_w.pop_front());
-                tr_q_wr.push_back(tr_aw);
+                tr_put_aw.clone_data_from(tr_q_w.pop_front());
+                tr_q_wr.push_back(tr_put_aw);
             end
         endcase
 
         this.check_outstanding();
-        print_queue();
         key.put();
     endtask
 
     virtual task put_w(TrAxi tr_w);
+        TrAxi tr_put_w = TrAxi::type_id::create("tr_put_w");
+        tr_put_w.clone_from(tr_w);
+
         key.get();
         `uvm_info(get_type_name(), "Chn W Put", UVM_DEBUG)
 
         case (tr_q_aw.size())
-            0: tr_q_w.push_back(tr_w);
+            0: tr_q_w.push_back(tr_put_w);
             default: begin
                 TrAxi tr_q_aw_1st = tr_q_aw.pop_front();
-                if (tr_w.data.size() != tr_q_aw_1st.len + 1)
+                if (tr_put_w.data.size() != tr_q_aw_1st.len + 1)
                     `uvm_fatal(get_type_name(), "W Data[$].Size Error")
 
-                tr_w.clone_data_from(tr_q_aw_1st);
-                tr_q_wr.push_back(tr_w);
+                tr_put_w.clone_data_from(tr_q_aw_1st);
+                tr_q_wr.push_back(tr_put_w);
             end
         endcase
 
         this.check_outstanding();
-        print_queue();
         key.put();
     endtask
 
@@ -126,7 +130,6 @@ class AxiSlvRef extends uvm_component;
         end
 
         this.check_outstanding();
-        print_queue();
         key.put();
     endtask
 
