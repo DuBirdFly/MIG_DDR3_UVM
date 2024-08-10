@@ -96,7 +96,20 @@ class AxiSlvScb extends uvm_scoreboard;
         end
         else begin
             for (int i = 0; i < tr_scb.data.size(); i++) begin
-                if (tr_scb.data[i] !== tr_ref.data[i]) begin
+                logic [`AXI_DATA_WIDTH-1:0]  scb_data = 'x;
+                logic [`AXI_DATA_WIDTH-1:0]  ref_data = 'x;
+                bit   [`AXI_WSTRB_WIDTH-1:0] scb_mask = tr_scb.align_mask[i];
+                bit   [`AXI_WSTRB_WIDTH-1:0] ref_mask = tr_ref.align_mask[i];
+
+                for (int j = 0; j < `AXI_WSTRB_WIDTH; j++)
+                    if (scb_mask[j])
+                        scb_data[j * 8 +: 8] = tr_scb.data[i][j * 8 +: 8];
+
+                for (int j = 0; j < `AXI_WSTRB_WIDTH; j++)
+                    if (ref_mask[j])
+                        ref_data[j * 8 +: 8] = tr_ref.data[i][j * 8 +: 8];
+
+                if (scb_data !== ref_data) begin
                     `uvm_warning("CRITICAL", $sformatf("Data Mismatch at Index %0d", i))
                     pass_flag = 0;
                     break;

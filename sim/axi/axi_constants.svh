@@ -8,7 +8,7 @@
     `define AXI_WSTRB_WIDTH (`AXI_DATA_WIDTH / 8)
     `define AXI_SIZE_MAX    $clog2(`AXI_WSTRB_WIDTH)
 
-    `define AXI_OUTSTANDING 8
+    `define AXI_OUTSTANDING 16
 
     // 不可配置
     `define AXI_LEN_WIDTH   8
