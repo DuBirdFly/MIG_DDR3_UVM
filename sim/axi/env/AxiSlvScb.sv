@@ -95,24 +95,21 @@ class AxiSlvScb extends uvm_scoreboard;
             pass_flag = 0;
         end
         else begin
-            for (int i = 0; i < tr_scb.data.size(); i++) begin
-                logic [`AXI_DATA_WIDTH-1:0]  scb_data = 'x;
-                logic [`AXI_DATA_WIDTH-1:0]  ref_data = 'x;
-                bit   [`AXI_WSTRB_WIDTH-1:0] scb_mask = tr_scb.align_mask[i];
-                bit   [`AXI_WSTRB_WIDTH-1:0] ref_mask = tr_ref.align_mask[i];
+            foreach (tr_scb.data[i]) begin
 
-                for (int j = 0; j < `AXI_WSTRB_WIDTH; j++)
-                    if (scb_mask[j])
-                        scb_data[j * 8 +: 8] = tr_scb.data[i][j * 8 +: 8];
+                //! scb_data 和 ref_data 每 8 bit 进行一次比较 (scb_data 的某个 8 bit 为 8'hx 时，不进行比较)
+                for (int j = 0; j < `AXI_DATA_WIDTH / 8; j++) begin
+                    logic [7:0] scb_data_8b = tr_scb.data[i][8*j +: 8];
+                    logic [7:0] ref_data_8b = tr_ref.data[i][8*j +: 8];
 
-                for (int j = 0; j < `AXI_WSTRB_WIDTH; j++)
-                    if (ref_mask[j])
-                        ref_data[j * 8 +: 8] = tr_ref.data[i][j * 8 +: 8];
-
-                if (scb_data !== ref_data) begin
-                    `uvm_warning("CRITICAL", $sformatf("Data Mismatch at Index %0d", i))
-                    pass_flag = 0;
-                    break;
+                    if (ref_data_8b === 8'hxx) begin
+                        continue; 
+                    end
+                    if (scb_data_8b !== ref_data_8b) begin
+                        `uvm_warning("CRITICAL", $sformatf("Data Mismatch at Index %0d", i))
+                        pass_flag = 0;
+                        break;
+                    end
                 end
             end
         end
