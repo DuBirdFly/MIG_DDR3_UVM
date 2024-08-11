@@ -13,7 +13,8 @@ class AxiMstrSeqRd extends uvm_sequence #(TrAxi);
 
     virtual task body();
         if (starting_phase != null) starting_phase.raise_objection(this);
-        case_0_run(16);
+        case_0_run(256);
+        // case_1_run();
         if (starting_phase != null) starting_phase.drop_objection(this);
     endtask
 
@@ -30,6 +31,15 @@ class AxiMstrSeqRd extends uvm_sequence #(TrAxi);
             `zpf_do_on_clone(tr, tr_ar, m_sequencer)
         end
 
+    endtask
+
+    virtual task case_1_run();
+        TrAxi tr_ar;
+
+        TrAxi tr = TrAxi::type_id::create("tr");
+        tr.wr_flag = 0;
+        `zpf_randomize_with(tr, {addr == 'h100; len == 0; burst == 1;})
+        `zpf_do_on_clone(tr, tr_ar, m_sequencer)
     endtask
 
 endclass

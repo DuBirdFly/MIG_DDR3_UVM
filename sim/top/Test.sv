@@ -53,7 +53,7 @@ class Test extends uvm_test;
         @(vifAxi.m_cb);
         axiMstrSeqWr.start(env.axiMstrEnv.axiMstrVirSqrWr);
 
-        #500ns;
+        #5000ns;
         if (env.axiMstrEnv.axiSlvRef.tr_q_aw.size() != 0) `uvm_warning("CRITICAL", "AW Queue is not empty in AxiSlvRef")
         if (env.axiMstrEnv.axiSlvRef.tr_q_w.size()  != 0) `uvm_warning("CRITICAL", "W  Queue is not empty in AxiSlvRef")
         if (env.axiMstrEnv.axiSlvRef.tr_q_wr.size() != 0) `uvm_warning("CRITICAL", "WR Queue is not empty in AxiSlvRef")
