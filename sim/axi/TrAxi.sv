@@ -181,8 +181,8 @@ class TrAxi extends uvm_sequence_item;
             bit [`AXI_ADDR_WIDTH-1:0] wrap_addr_start = addr / wrap_addr_space * wrap_addr_space;
             bit [`AXI_ADDR_WIDTH-1:0] wrap_addr_end   = wrap_addr_start + (2 ** size) * len;
 
-            if (addr % (2 ** size) != 0) `zpf_fatal("WRAP Burst must be aligned");
-            if (len != 1 && len != 3 && len != 7 && len != 15) `zpf_fatal("WRAP Burst len must be 1, 3, 7, 15");
+            if (addr % (2 ** size) != 0) `uvm_fatal(get_type_name(), "WRAP Burst must be aligned");
+            if (len != 1 && len != 3 && len != 7 && len != 15) `uvm_fatal(get_type_name(), "WRAP Burst len must be 1, 3, 7, 15");
 
             for (int i = 0; i <= len; i++) begin
                 axi_addr[i] = addr_tmp;

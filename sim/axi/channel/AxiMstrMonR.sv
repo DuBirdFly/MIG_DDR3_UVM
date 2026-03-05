@@ -32,7 +32,7 @@ class AxiMstrMonR extends uvm_driver #(TrAxi);
             if (vifAxi.mon_cb.rvalid && vifAxi.mon_cb.rready) begin
                 int catch_queue_index = -1;
 
-                if (vifAxi.mon_cb.rresp != 0) `zpf_fatal("RRESP NOT OK");
+                if (vifAxi.mon_cb.rresp != 0) `uvm_fatal(get_type_name(), "RRESP NOT OK");
 
                 foreach (tr_q[i]) begin
                     if (tr_q[i].id == vifAxi.mon_cb.rid) begin
